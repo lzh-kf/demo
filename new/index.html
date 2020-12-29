@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>new方式实现</title>
+  <title>自定义new方式实现</title>
 </head>
+
 <body>
-  
+
 </body>
 <script src="./index.js"></script>
 <script>
-  function Car() {}
+  function Car() { }
   car1 = new Car();
   car2 = customNew(Car);
   console.log(car1); // undefined
@@ -18,4 +20,5 @@
   console.log(car2);
   console.log(car1);
 </script>
+
 </html>

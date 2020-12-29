@@ -1,13 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    
+
 </body>
 <script src="./index.js">
 </script>
+<script>
+    setLocal.ltoken = 456
+    const { ltoken } = setLocal
+    console.log(ltoken)
+    setSession.stoken = { a: 123 }
+    const { stoken } = setSession
+    console.log(stoken)
+
+
+</script>
+
 </html>

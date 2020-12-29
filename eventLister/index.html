@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
-    
+
 </body>
 <script src="./index.js">
 </script>
 <script>
     const eventLister = new EventLister()
-eventLister.resgiterEvent('click',(e)=> {
-console.log(e)
-})
-eventLister.resgiterEvent('click',(e)=> {
-console.log(e)
-})
-eventLister.resgiterEvent('click',(e)=> {
-console.log(e)
-})
-eventLister.emit('click',456,789,123)
-eventLister.emit('click',456,789,123)
-eventLister.emit('click',456,789,123)
-eventLister
+    eventLister.resgiterEvent('click', (e) => {
+        console.log(e)
+    })
+    eventLister.resgiterEvent('click', (e) => {
+        console.log(e)
+    })
+    eventLister.resgiterEvent('click', (e) => {
+        console.log(e)
+    })
+    eventLister.emit('click', 456, 789, 123)
+    eventLister.emit('click', 456, 789, 123)
+    eventLister.emit('click', 456, 789, 123)
+    eventLister
 </script>
+
 </html>
