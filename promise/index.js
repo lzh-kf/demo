@@ -8,28 +8,25 @@ class CustomPromise {
         this.reject = this.reject.bind(this)
         hander(this.resolve, this.reject)
     }
-    resolve(value) {
-        // 状态一旦修改 则不可更改
+    resolve (value) {
         if (this.status === 'pending') {
             this.status = 'fulfilled'
             this.value = value
         }
     }
-    reject(value) {
-        // 状态一旦修改 则不可更改
+    reject (value) {
         if (this.status === 'pending') {
             this.status = 'rejected'
             this.value = value
         }
     }
-    then(successCallback, errorCallback) {
+    then (successCallback, errorCallback) {
         if (this.status === 'fulfilled' && successCallback) {
             try {
                 return new CustomPromise((resolve) => {
                     resolve(successCallback(this.value))
                 })
             } catch (error) {
-                // 捕捉异常，如果异常，则修改状态
                 this.status = 'rejected'
                 this.value = error
             }
@@ -44,20 +41,22 @@ class CustomPromise {
             }
         }
     }
-    catch(errorCallback) {
+    catch (errorCallback) {
         if (this.status === 'rejected' && errorCallback) {
             errorCallback(this.value)
         }
     }
 }
 
-const test = () => {
+const testFn = () => {
     return new CustomPromise((resolve, reject) => {
         resolve('resolve')
     })
 }
 
-test().then(res => {
+testFn().then(res => {
+    console.log('res', res)
     throw new Error('fdsfs')
 }).catch(error => {
+    console.log('001error', error)
 })
