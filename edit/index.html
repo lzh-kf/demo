@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    .editable:focus {
+        outline: none;
+    }
+
+    .editable {
+        min-height: 80vh;
+        width: 80vw;
+        margin: 0vh 10vw;
+        border: 1px solid #dcdfe6;
+        padding: 10px 30px;
+        font-size: 14px;
+        box-sizing: border-box;
+    }
+
+    .btns {
+        display: flex;
+        margin: 10vh 10vw 1vh 10vw;
+    }
+
+    .btns button {
+        margin-right: 5px;
+        padding: 1px 3px;
+        display: inline-block;
+    }
+
+    .testMourse {
+        width: 400px;
+        height: 600px;
+        background-color: gray;
+    }
+</style>
+
+<body>
+    <div class="testMourse" onmousedown="handleMousedown(event)" onmouseup="handleMouseup(event)">
+    </div>
+    <div class="btns">
+        <button onclick="runExecCommand('formatblock','<p>')">段落</button>
+        <button onclick="runExecCommand('bold')">加粗字体</button>
+        <button onclick="appendImg('insertimage')">插入图片</button>
+        <button onclick="appendLink('createlink')">插入链接</button>
+        <button onclick="setFontSize('fontsize')">设置字体</button>
+        <button onclick="setForeColor('forecolor')">设置字体颜色</button>
+        <button onclick="runExecCommand('insertHTML','<br>')">插入br标签</button>
+        <button onclick="runExecCommand('copy')">拷贝内容</button>
+        <button onclick="runExecCommand('cut')">剪切内容</button>
+        <button onclick="runExecCommand('delete')">删除内容</button>
+        <button onclick="runExecCommand('insertOrderedList')">有序列表</button>
+        <button onclick="runExecCommand('insertUnorderedList')">无序列表</button>
+        <button onclick="runExecCommand('justifyCenter')">文字居中</button>
+        <button onclick="runExecCommand('justifyFull')">文本对齐</button>
+        <button onclick="runExecCommand('justifyLeft')">左对齐</button>
+        <button onclick="runExecCommand('justifyRight')">右对齐</button>
+        <button onclick="appendTable()">插入表格</button>
+    </div>
+    <div class="editable" id="richedit" contentEditable="true">
+    </div>
+</body>
+<script>
+
+    const richedit = document.querySelector('#richedit')
+
+    const testMourse = document.querySelector('.testMourse')
+
+
+    const reg = /^\d+$/
+
+    function runExecCommand(name, value = null) {
+        document.execCommand(name, false, value)
+    }
+
+    function appendImg(name) {
+        const url = prompt("请输入图片链接");
+        runExecCommand(name, url)
+    }
+
+    function appendLink(name) {
+        const url = prompt("请输入链接");
+        runExecCommand(name, url)
+    }
+
+    function setFontSize(name) {
+        runExecCommand(name, 3)
+    }
+
+    function setForeColor(name) {
+        runExecCommand(name, 'red')
+    }
+
+    function contentIsEmpty() {
+        return richedit.innerText === ''
+    }
+
+    function setElementStyle(element) {
+        element.style.borderCollapse = 'collapse'
+        element.style.border = '1px solid black'
+        element.style.padding = '5px'
+        element.style.textAlign = 'center'
+        element.style.minWidth = '100px'
+    }
+
+    function appendTable() {
+        let rowCount = prompt("请输入几行");
+        let columnCount = prompt("请输入几列");
+        if (reg.test(rowCount) && reg.test(columnCount)) {
+            rowCount = Number(rowCount)
+            columnCount = Number(columnCount)
+            const table = document.createElement('table')
+            setElementStyle(table)
+            const trHead = document.createElement('tr')
+            setElementStyle(trHead)
+            const trBody = document.createElement('tr')
+            setElementStyle(trBody)
+            for (let i = 0; i < rowCount; i++) {
+                const thHead = document.createElement('th')
+                setElementStyle(thHead)
+                const headNode = document.createTextNode('默认表头')
+                thHead.append(headNode)
+                trHead.append(thHead)
+            }
+            table.append(trHead)
+            for (let i = 0; i < columnCount; i++) {
+                const trBody = document.createElement('tr')
+                setElementStyle(trBody)
+                for (let j = 0; j < rowCount; j++) {
+                    const tdBody = document.createElement('td')
+                    setElementStyle(tdBody)
+                    trBody.append(tdBody)
+                }
+                table.append(trBody)
+            }
+            richedit.append(table)
+        } else {
+            alert('列和行只能输入数字')
+        }
+    }
+
+    function handleMousedown(e) {
+        console.log('按下', e)
+        testMourse.onmousemove = handleMousemove
+    }
+
+    function handleMouseup(e) {
+        testMourse.onmousemove = null
+        console.log('按起', e)
+    }
+
+    function handleMousemove(e) {
+        console.log('移动', e)
+    }
+
+</script>
+
+</html>

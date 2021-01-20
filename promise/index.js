@@ -1,66 +1,63 @@
-function customPromise (hander) {
-    if (typeof hander !== 'function') {
-        throw new Error('hander is not a funtion')
+class CustomPromise {
+    constructor(hander) {
+        if (typeof hander !== 'function') {
+            throw new Error('hander is not a funtion')
+        }
+        this.status = 'pending'
+        this.resolve = this.resolve.bind(this)
+        this.reject = this.reject.bind(this)
+        hander(this.resolve, this.reject)
     }
-    console.log(this)
-    customPromise.status = 'pending'
-    customPromise.resolve = function (value) {
+    resolve(value) {
         // 状态一旦修改 则不可更改
-        if (customPromise.status === 'pending') {
-            customPromise.status = 'fulfilled'
-            customPromise.value = value
+        if (this.status === 'pending') {
+            this.status = 'fulfilled'
+            this.value = value
         }
     }
-    customPromise.reject = function (value) {
-        if (customPromise.status === 'pending') {
-            customPromise.status = 'rejected'
-            customPromise.value = value
+    reject(value) {
+        // 状态一旦修改 则不可更改
+        if (this.status === 'pending') {
+            this.status = 'rejected'
+            this.value = value
         }
     }
-    hander(customPromise.resolve, customPromise.reject)
-}
-
-customPromise.prototype.then = function (successCallback, errorCallback) {
-    if (customPromise.status === 'pending') {
-        return new customPromise((resolve, reject) => { })
-    }
-    if (successCallback && customPromise.status === 'fulfilled') {
-        try {
-            const result = successCallback(customPromise.value)
-            if (result) {
-                return new customPromise((resolve, reject) => {
-                    resolve(result)
+    then(successCallback, errorCallback) {
+        if (this.status === 'fulfilled' && successCallback) {
+            try {
+                return new CustomPromise((resolve) => {
+                    resolve(successCallback(this.value))
+                })
+            } catch (error) {
+                // 捕捉异常，如果异常，则修改状态
+                this.status = 'rejected'
+                this.value = error
+            }
+        }
+        if (this.status === 'rejected') {
+            if (errorCallback) {
+                errorCallback(this.value)
+            } else {
+                return new CustomPromise((resolve, reject) => {
+                    reject(this.value)
                 })
             }
-        } catch (error) {
-            customPromise.status = 'rejected'
-            customPromise.value = error
         }
     }
-    if (customPromise.status === 'rejected') {
-        if (errorCallback) {
-            errorCallback(customPromise.value)
-        } else {
-            return new customPromise((resolve, reject) => {
-                reject(customPromise.value)
-            })
+    catch(errorCallback) {
+        if (this.status === 'rejected' && errorCallback) {
+            errorCallback(this.value)
         }
-    }
-}
-
-customPromise.prototype.catch = function (errorCallback) {
-    if (errorCallback && customPromise.status === 'rejected') {
-        errorCallback(customPromise.value)
     }
 }
 
 const test = () => {
-    return new customPromise((resolve, reject) => {
-        resolve(123)
+    return new CustomPromise((resolve, reject) => {
+        resolve('resolve')
     })
 }
 
 test().then(res => {
-    console.log(res)
-    return res
-}).then()
+    throw new Error('fdsfs')
+}).catch(error => {
+})
