@@ -1,4 +1,4 @@
-##常见的工具类实现
+## 常见的工具类实现
 1. promise（简单版实现）
 2. 事件收集类似vue里面的eventbus（eventLister）
 3. 全局状态管理（store）
