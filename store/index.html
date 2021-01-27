@@ -1,57 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>store</title>
 </head>
-<body></body>
 <script src="./helper.js"></script>
 <script src="./index.js"></script>
 <script>
 
-const store = new Store({
-      state:{
-      user:{}
+  const store = new Store({
+    state: {
+      list: [{
+        a: 123456, as: {
+          ab: 456
+        }
+      }],
+
     },
-      mutations:{
-      setValue (state,data) {
+    mutations: {
+      setlist(state, data) {
         state.value = data
       }
-      },
-      actions:{
-        asynSetValue ({commit},data) {
-          return setTimeout(()=> {
-            commit('setValue',data)
-          },3000)
-        }
-      },
-    });
-    // store.state.user.name = 456
-    // console.log(store.state.count)
-    // 非模块
-    // 同步修改数据
-    // store.commit('setValue','11111')
+    },
+    actions: {
+      asyncsetlist({ commit }, data) {
+        return setTimeout(() => {
+          commit('setlist', data)
+        }, 3000)
+      }
+    },
+  });
 
-    // // 异步修改数据
-    store.dispatch('asynSetValue',456).then(res=> {
-      console.log('异步',res)
-    })
+</script>
 
-    // // 订阅Mutation
-    store.subscribeMutation('setValue',(value)=> {
-      console.log('setValue',value)
-    })
-
-    // store.unSubscribeMutation('setValue')
-
-    // // 模块
-    // store.modules.module1.commit('setValue','999')
-
-    // store.modules.module1.dispatch('asynSetValue','0000').then(res=> {
-    // })
-    
-    // store.modules.module1.subscribeMutation('setValue',(value)=> {
-    // })
-  </script>
 </html>
