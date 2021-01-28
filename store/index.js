@@ -1,24 +1,27 @@
 class Store {
-    constructor(options) {
+    constructor(options = {}) {
         if (isObject(options.state)) {
             this.state = dataProxy.bind(this)(options.state)
         }
+        // 是否开启严格模式
+        this.strict = options.strict
         this.mutations = options.mutations
         this.actions = options.actions
-        this.MutationCallbacks = new Map()
         this.AllTypeCallbacks = []
+        this.MutationCallbacks = new Map()
         this._resolve = new Map()
         this.commitFlag = false
         this.setModules(options)
         this.bindContext()
     }
-    setModules (options) {
-        if (options.modules && Object.keys(options.modules).length) {
+    setModules ({ modules }) {
+        if (modules && Object.keys(modules).length) {
             this.modules = {}
-            for (let [key, value] of Object.entries(options.modules)) {
+            for (let [key, value] of Object.entries(modules)) {
                 if (value instanceof Store) {
                     this.modules[key] = value
                 } else {
+                    this.modules = null
                     throw new Error(`module ${key} is not Store instance`)
                 }
             }

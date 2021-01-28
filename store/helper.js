@@ -34,7 +34,7 @@ function dataProxy (data) {
             return Reflect.get(target, propKey, receiver)
         },
         set (target, propKey, value, receiver) {
-            if (that.commitFlag) {
+            if (!that.strict || that.commitFlag) {
                 return Reflect.set(target, propKey, value, receiver)
             } else {
                 console.error('just can use commit method change state')

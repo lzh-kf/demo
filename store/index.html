@@ -9,29 +9,41 @@
 <script src="./helper.js"></script>
 <script src="./index.js"></script>
 <script>
-
   const store = new Store({
     state: {
-      list: [{
-        a: 123456, as: {
-          ab: 456
-        }
+      testData: [{
+        value: "123456"
+      }],
+      testData1: [{
+        value: "123456"
       }],
 
     },
     mutations: {
-      setlist(state, data) {
-        state.value = data
+      setTestData(state, data) {
+        state.testData = data
+      },
+      setTestData1(state, data) {
+        state.testData1 = data
       }
     },
     actions: {
-      asyncsetlist({ commit }, data) {
+      asyncSetTestData({ commit }, data) {
         return setTimeout(() => {
-          commit('setlist', data)
+          commit('setTestData', data)
         }, 3000)
       }
     },
   });
+
+  store.commit('setTestData', 456789)
+  store.commit('setTestData1', 456789)
+  // 订阅单个类型
+  store.subscribeMutation('setTestData', (value) => {
+  })
+  //订阅所有类型
+  store.subscribe((type, state) => {
+  })
 
 </script>
 
