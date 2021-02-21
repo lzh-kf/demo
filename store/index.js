@@ -17,7 +17,7 @@ class Store {
     setModules ({ modules }) {
         if (modules && Object.keys(modules).length) {
             this.modules = {}
-            for (let [key, value] of Object.entries(modules)) {
+            for (const [key, value] of Object.entries(modules)) {
                 if (value instanceof Store) {
                     this.modules[key] = value
                 } else {
@@ -91,7 +91,7 @@ class Store {
             item.push(callback)
             this.MutationCallbacks.set(type, item)
         } else {
-            throw new Error('argument[0] must is funcion')
+            throw new Error('argument[1] must is funcion')
         }
     }
     unSubscribeMutation (type) {

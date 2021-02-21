@@ -1,38 +1,49 @@
+
+const status = {
+    pending: Symbol(),
+    fulfilled: Symbol(),
+    rejected: Symbol()
+}
+
+function isFunction (value) {
+    return Object.prototype.toString.call(value) === '[object Function]'
+}
+
 class CustomPromise {
     constructor(hander) {
-        if (typeof hander !== 'function') {
+        if (!isFunction(hander)) {
             throw new Error('hander is not a funtion')
         }
-        this.status = 'pending'
+        this.status = status.pending
         this.resolve = this.resolve.bind(this)
         this.reject = this.reject.bind(this)
         hander(this.resolve, this.reject)
     }
     resolve (value) {
-        if (this.status === 'pending') {
-            this.status = 'fulfilled'
+        if (this.status === status.pending) {
+            this.status = status.fulfilled
             this.value = value
         }
     }
     reject (value) {
-        if (this.status === 'pending') {
-            this.status = 'rejected'
+        if (this.status === status.pending) {
+            this.status = status.rejected
             this.value = value
         }
     }
     then (successCallback, errorCallback) {
-        if (this.status === 'fulfilled' && successCallback) {
+        if (this.status === status.fulfilled && isFunction(successCallback)) {
             try {
                 return new CustomPromise((resolve) => {
                     resolve(successCallback(this.value))
                 })
             } catch (error) {
-                this.status = 'rejected'
+                this.status = status.rejected
                 this.value = error
             }
         }
-        if (this.status === 'rejected') {
-            if (errorCallback) {
+        if (this.status === status.rejected) {
+            if (isFunction(errorCallback)) {
                 errorCallback(this.value)
             } else {
                 return new CustomPromise((resolve, reject) => {
@@ -42,7 +53,7 @@ class CustomPromise {
         }
     }
     catch (errorCallback) {
-        if (this.status === 'rejected' && errorCallback) {
+        if (this.status === status.rejected && isFunction(errorCallback)) {
             errorCallback(this.value)
         }
     }

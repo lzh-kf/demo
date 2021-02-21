@@ -1,5 +1,6 @@
+
 function handleError (type) {
-    console.error(`${type} method is not defined, please checked`)
+    console.error(`${type} method is not defined`)
 }
 
 function isObject (value) {
