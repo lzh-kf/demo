@@ -1,7 +1,11 @@
+const setProxy = Symbol('setProxy')
+
+const cloneData = Symbol('cloneData')
 class Store {
+
     constructor(options = {}) {
         if (isObject(options.state)) {
-            this.state = dataProxy.bind(this)(options.state)
+            this.state = this[cloneData](options.state)
         }
         // 是否开启严格模式
         this.strict = options.strict
@@ -13,7 +17,58 @@ class Store {
         this.commitFlag = false
         this.setModules(options)
         this.bindContext()
+        this.resetWriteArrayMethods()
     }
+
+    [setProxy] (data) {
+        const that = this
+        data = new Proxy(data, {
+            get (target, propKey, receiver) {
+                return Reflect.get(target, propKey, receiver)
+            },
+            set (target, propKey, value, receiver) {
+                if (!that.strict || that.commitFlag) {
+                    return Reflect.set(target, propKey, value, receiver)
+                } else {
+                    console.error('just can use commit method change state')
+                    return false
+                }
+            },
+        })
+        return data
+    }
+
+    [cloneData] (data) {
+        if (isArray(data)) {
+            return this[setProxy](data.map((item) => {
+                return this[cloneData](item)
+            }))
+        } else if (isObject(data)) {
+            let result = {}
+            for (let key in data) {
+                result[key] = this[cloneData](data[key])
+            }
+            return this[setProxy](result)
+        } else {
+            return data
+        }
+    }
+
+    resetWriteArrayMethods () {
+        const methods = ['push', 'pop', 'unshift', 'shift', 'splice', 'sort']
+        const context = this
+        methods.forEach(key => {
+            const currentMethods = Array.prototype[key]
+            Array.prototype[key] = function (...args) {
+                if (!context.strict || context.commitFlag) {
+                    return currentMethods.apply(this, args)
+                } else {
+                    console.error('just can use commit method change state')
+                }
+            }
+        })
+    }
+
     setModules ({ modules }) {
         if (modules && Object.keys(modules).length) {
             this.modules = {}
@@ -27,10 +82,12 @@ class Store {
             }
         }
     }
+
     bindContext () {
-        const methods = ['commit', 'dispatch', 'subscribe', 'unSubscribe', 'subscribeMutation', 'unSubscribeMutation']
+        const methods = ['commit', 'dispatch', 'subscribe', 'unSubscribe', 'subscribeMutation', 'unSubscribeMutation', 'resetWriteArrayMethods']
         methods.forEach(method => this[method] = this[method].bind(this))
     }
+
     commit (type, value) {
         Promise.resolve().then(() => {
             if (this.mutations) {
@@ -55,6 +112,7 @@ class Store {
             }
         })
     }
+
     dispatch (type, value) {
         return new Promise((resolve) => {
             if (this.actions) {
@@ -70,6 +128,7 @@ class Store {
             }
         })
     }
+
     subscribe (callback) {
         if (isFunction(callback)) {
             let { length } = this.AllTypeCallbacks
@@ -82,9 +141,11 @@ class Store {
             throw new Error('argument[0] must is funcion')
         }
     }
+
     unSubscribe (index) {
         this.AllTypeCallbacks[index] && this.AllTypeCallbacks.splice(index, 1)
     }
+
     subscribeMutation (type, callback) {
         if (isFunction(callback)) {
             const item = this.MutationCallbacks.get(type) || []
@@ -94,6 +155,7 @@ class Store {
             throw new Error('argument[1] must is funcion')
         }
     }
+
     unSubscribeMutation (type) {
         if (this.MutationCallbacks.get(type)) {
             this.MutationCallbacks.delete(type)

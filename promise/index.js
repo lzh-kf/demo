@@ -1,8 +1,8 @@
 
 const status = {
-    pending: Symbol(),
-    fulfilled: Symbol(),
-    rejected: Symbol()
+    pending: Symbol('pending'),
+    fulfilled: Symbol('fulfilled'),
+    rejected: Symbol('rejected')
 }
 
 function isFunction (value) {
@@ -15,6 +15,7 @@ class CustomPromise {
             throw new Error('hander is not a funtion')
         }
         this.status = status.pending
+        this.thenCallback = {}
         this.resolve = this.resolve.bind(this)
         this.reject = this.reject.bind(this)
         hander(this.resolve, this.reject)
@@ -23,51 +24,65 @@ class CustomPromise {
         if (this.status === status.pending) {
             this.status = status.fulfilled
             this.value = value
+            this.notify()
         }
     }
     reject (value) {
         if (this.status === status.pending) {
             this.status = status.rejected
             this.value = value
+            this.notify()
         }
     }
-    then (successCallback, errorCallback) {
-        if (this.status === status.fulfilled && isFunction(successCallback)) {
-            try {
-                return new CustomPromise((resolve) => {
-                    resolve(successCallback(this.value))
-                })
-            } catch (error) {
-                this.status = status.rejected
-                this.value = error
-            }
+    notify () {
+        if (this.status === status.pending) {
+            return false
         }
-        if (this.status === status.rejected) {
-            if (isFunction(errorCallback)) {
+        const { successCallback, errorCallback } = this.thenCallback
+        if (this.status === status.fulfilled && successCallback) {
+            try {
+                this._resolve(successCallback(this.value))
+            } catch (error) {
+                this._reject(error)
+            }
+        } else if (this.status === status.rejected) {
+            if (errorCallback) {
                 errorCallback(this.value)
             } else {
-                return new CustomPromise((resolve, reject) => {
-                    reject(this.value)
-                })
+                this._reject(this.value)
             }
         }
+        this.thenCallback = {}
+    }
+    then (successCallback, errorCallback) {
+        this.thenCallback = {
+            successCallback,
+            errorCallback
+        }
+        return new CustomPromise((resolve, reject) => {
+            this._resolve = resolve
+            this._reject = reject
+            this.notify()
+        })
     }
     catch (errorCallback) {
-        if (this.status === status.rejected && isFunction(errorCallback)) {
-            errorCallback(this.value)
+        this.thenCallback = {
+            errorCallback
         }
+        return new CustomPromise((resolve, reject) => {
+            this._resolve = resolve
+            this._reject = reject
+            this.notify()
+        })
     }
 }
 
-const testFn = () => {
-    return new CustomPromise((resolve, reject) => {
-        resolve('resolve')
-    })
-}
-
-testFn().then(res => {
-    console.log('res', res)
-    throw new Error('fdsfs')
-}).catch(error => {
-    console.log('001error', error)
+const p2 = new Promise(function (resolve, reject) {
+    setTimeout(() => reject(456), 3000)
 })
+
+p2.then(result => console.log(result), (error) => {
+    console.log('error', error)
+}).catch(error => console.log(error)).then(() => {
+})
+

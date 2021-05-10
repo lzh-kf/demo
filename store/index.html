@@ -10,18 +10,24 @@
 <script src="./index.js"></script>
 <script>
   const store = new Store({
+    strict: false,
     state: {
+      loading: false,
       testData: [{
         value: "123456"
       }],
       testData1: [{
-        value: "123456"
+        value: "123456",
+        a: {
+          a: 456
+        }
       }],
+      arr: [0, 3]
 
     },
     mutations: {
       setTestData(state, data) {
-        state.testData = data
+        state.testData.push(data)
       },
       setTestData1(state, data) {
         state.testData1 = data
@@ -35,16 +41,8 @@
       }
     },
   });
-
-  store.commit('setTestData', 456789)
-  store.commit('setTestData1', 456789)
-  // 订阅单个类型
-  store.subscribeMutation('setTestData', (value) => {
-  })
-  //订阅所有类型
-  store.subscribe((type, state) => {
-  })
-
+  store.state.loading = 20
+  console.log('testData', store.state)
 </script>
 
 </html>
