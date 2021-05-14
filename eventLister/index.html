@@ -13,22 +13,11 @@
 <script src="./index.js">
 </script>
 <script>
-
     const eventLister = new EventLister()
-
     eventLister.resgiterEvent('click', (e) => {
         console.log(e)
     })
-
-    eventLister.resgiterEvent('click', (e) => {
-        console.log(e)
-    })
-
-    eventLister.resgiterEvent('click', (e) => {
-        console.log(e)
-    })
-
-    eventLister.emit('click', 456, 789, 123)
+    eventLister.emit('click', 789)
 
 
 </script>

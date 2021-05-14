@@ -4,9 +4,7 @@ const cloneData = Symbol('cloneData')
 class Store {
 
     constructor(options = {}) {
-        if (isObject(options.state)) {
-            this.state = this[cloneData](options.state)
-        }
+        this.state = this[cloneData](options.state)
         // 是否开启严格模式
         this.strict = options.strict
         this.mutations = options.mutations
@@ -38,16 +36,26 @@ class Store {
         return data
     }
 
-    [cloneData] (data) {
+    [cloneData] (data, tempData = new WeakMap()) {
+        // 循环引用
+        if (tempData.has(data)) {
+            return tempData.get(data)
+        }
         if (isArray(data)) {
             return this[setProxy](data.map((item) => {
-                return this[cloneData](item)
+                return this[cloneData](item, tempData)
             }))
         } else if (isObject(data)) {
             let result = {}
-            for (let key in data) {
-                result[key] = this[cloneData](data[key])
-            }
+            tempData.set(data, result)
+            // 不使用for in 的原因 是因为 他会遍历自己继承的可枚举的属性 但是object.keys 只会遍历自身的属性
+            Object.keys(data).forEach(key => {
+                result[key] = this[cloneData](data[key], tempData)
+            })
+            // 遍历symbol做为key的值
+            Object.getOwnPropertySymbols(data).forEach(key => {
+                result[key] = this[cloneData](data[key], tempData)
+            })
             return this[setProxy](result)
         } else {
             return data

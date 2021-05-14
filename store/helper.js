@@ -1,17 +1,21 @@
+const { toString } = Object.prototype
+
+function getDataType (value) {
+    return toString.call(value)
+}
 
 function handleError (type) {
     console.error(`${type} method is not defined`)
 }
 
 function isObject (value) {
-    return typeof value === 'object' && value !== null
+    return getDataType(value) === '[object Object]'
 }
 
 function isArray (value) {
-    return Array.isArray(value)
+    return getDataType(value) === '[object Array]'
 }
 
 function isFunction (value) {
-    return Object.prototype.toString.call(value) === '[object Function]'
+    return getDataType(value) === '[object Function]'
 }
-

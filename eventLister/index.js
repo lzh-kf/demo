@@ -1,24 +1,20 @@
+const hander = new Map()
 class EventLister {
-    constructor() {
-        this.handler = {}
-    }
     resgiterEvent (eventName, callback) {
-        const item = this.handler[eventName]
-        if (item) {
-            item.push(callback)
+        if (hander.has(eventName)) {
+            throw new Error(`${eventName} is excit `)
         } else {
-            this.handler[eventName] = [callback]
+            hander.set(eventName, callback)
         }
     }
     emit (eventName, ...args) {
         Promise.resolve().then(() => {
-            const item = this.handler[eventName]
-            item && item.forEach(callback => callback(args))
+            hander.get(eventName)?.(args)
         })
     }
     unResgiterEvent (eventName) {
-        if (this.handler[eventName]) {
-            delete this.handler[eventName]
+        if (hander.has(eventName)) {
+            hander.delete(eventName)
         }
     }
 }
